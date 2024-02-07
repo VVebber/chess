@@ -1,0 +1,5 @@
+# ninja log v5
+1	2094	1707287638400675245	CMakeFiles/Chess.dir/src/Figures/Figure.cpp.o	c6459410d4728eb4
+2	2144	1707287638452357157	CMakeFiles/Chess.dir/src/Windows/Setting.cpp.o	600a21584e390b14
+2	2230	1707287638539135389	CMakeFiles/Chess.dir/src/Windows/PlayMenu.cpp.o	18f75cc53ea485ca
+0	2365	1707287638674813469	CMakeFiles/Chess.dir/src/main.cpp.o	8a3527a308e88ba6

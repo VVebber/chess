@@ -1,0 +1,3 @@
+/Users/danilmalyshev/Desktop/MyProgect/Chess/CMakeFiles/Chess.dir
+/Users/danilmalyshev/Desktop/MyProgect/Chess/CMakeFiles/edit_cache.dir
+/Users/danilmalyshev/Desktop/MyProgect/Chess/CMakeFiles/rebuild_cache.dir
