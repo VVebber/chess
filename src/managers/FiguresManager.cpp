@@ -37,14 +37,18 @@ void FiguresManager::update(QJsonObject data)
   for(int i = 0; i < figures.size(); i++)
   {
     QJsonObject data = figures[i].toObject();
-    QJsonArray pos = data[START_POSITIONS].toArray();
-    for(int j = 0; j < data[COUNT_FIGURE].toInt(); j++)
+    QJsonObject posPlayer = data[START_POSITIONS].toObject();
+    for(auto key : posPlayer.keys())
     {
+      QJsonArray arrow = posPlayer[key].toArray();
+      for(int j = 0; j < arrow.size(); j++)
+      {
 
-      Figure* figure = new Figure(data);
-      figure->setPosition(pos.at(j).toString());
-      figure->setParentItem(this);
-      m_figures.push_back(figure);
+        Figure* figure = new Figure(data);
+        figure->setPosition(arrow.at(j).toString());
+        figure->setParentItem(this);
+        m_figures.push_back(figure);
+      }
     }
   }
 }

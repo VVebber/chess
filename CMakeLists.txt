@@ -26,6 +26,8 @@ add_executable(QtChess
     src/ui/Chess/ChessMenu.h src/ui/Chess/ChessMenu.cpp
     src/ui/Chess/ChessEditor.h src/ui/Chess/ChessEditor.cpp
 
+    src/ui/Chess/Subwidgets/FigureForm.h     src/ui/Chess/Subwidgets/FigureForm.cpp
+
     src/models/Figure.h src/models/Figure.cpp
     src/models/BoardChess.h src/models/BoardChess.cpp
 

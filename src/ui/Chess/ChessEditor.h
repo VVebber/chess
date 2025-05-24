@@ -3,6 +3,8 @@
 
 #include "../base/BaseWidget.h"
 
+class FigureForm;
+
 class QSpinBox;
 class QLineEdit;
 class QVBoxLayout;
@@ -29,6 +31,9 @@ signals:
 public slots:
   void toggleCellState(const QString cell);
 
+private slots:
+  void onClickedAddFigureForm();
+
 private:
   void setup();
 
@@ -51,13 +56,13 @@ private:
   QLineEdit* m_nameBoard;
   QLineEdit* m_dimensions;
   QSpinBox* m_countPlayers;
-  QVBoxLayout* m_figuresList;
+  QVBoxLayout* m_figuresListWidget;
   QButtonGroup* m_btnGroup;
 
   CellType m_currentType;
 
-  QList<std::function<QJsonObject()>> m_figureExtractors;
-  QMap<int, std::function<void(const QString& str)>> m_updatePos;
+  QList<FigureForm*> m_figuresListObject;
+  QMap<int, FigureForm*> m_updatePos;
 };
 
 #endif // CHESSEDITOR_H

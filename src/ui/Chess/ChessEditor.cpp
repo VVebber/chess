@@ -2,6 +2,8 @@
 #include "../../Common.h"
 #include "../../managers/ChessBoardManager.h"
 
+#include "Subwidgets/FigureForm.h"
+
 #include <QMenu>
 #include <QLabel>
 #include <QLayout>
@@ -20,7 +22,7 @@ ChessEditor::ChessEditor()
   m_dimensions = new QLineEdit;
   m_nameBoard = new QLineEdit;
   m_countPlayers = new QSpinBox;
-  m_figuresList = new QVBoxLayout;
+  m_figuresListWidget = new QVBoxLayout;
 
   m_btnGroup = new QButtonGroup;
   m_btnGroup->setExclusive(false);
@@ -90,7 +92,7 @@ void ChessEditor::toggleCellState(const QString cell)
       return;
     }
 
-   m_updatePos[id](cell);
+   m_updatePos[id]->chanPos(cell, btn);
    btn->setObjectName("");
   }
 }
@@ -238,9 +240,8 @@ void ChessEditor::save()
       dimensions.append(part);
 
   QJsonArray figuresArray;
-  for (const auto& f : m_figureExtractors)
-    figuresArray.append(f());
-
+  for (const auto& f : m_figuresListObject)
+    figuresArray.append(f->toJson());
 
   board[DIMENSIONS] = dimensions;
 
@@ -274,7 +275,7 @@ QWidget* ChessEditor::initRightSidebar()
 
   QWidget* figuresWidget = new QWidget;
   QVBoxLayout* figuresList = new QVBoxLayout(figuresWidget);
-  figuresList->addLayout(m_figuresList);
+  figuresList->addLayout(m_figuresListWidget);
   figuresList->addWidget(addFigure);
   figuresWidget->setLayout(figuresList);
   figuresWidget->setVisible(false);
@@ -293,7 +294,7 @@ QWidget* ChessEditor::initRightSidebar()
   layout->addWidget(figuresWidget, 5, 0, 1, 2);
   layout->addWidget(saveProperties, 6, 0, 1, 2);
 
-  connect(addFigure, &QPushButton::clicked, this, &ChessEditor::setupFigureForm);
+  connect(addFigure, &QPushButton::clicked, this, &ChessEditor::onClickedAddFigureForm);
   connect(saveProperties, &QPushButton::clicked, this, &ChessEditor::save);
   connect(toolBtn1, &QToolButton::clicked, [figuresWidget](){
     figuresWidget->setVisible(!figuresWidget->isVisible());
@@ -305,9 +306,24 @@ QWidget* ChessEditor::initRightSidebar()
   return mainWidget;
 }
 
+void ChessEditor::onClickedAddFigureForm()
+{
+  FigureForm* figureForm = new FigureForm(m_countPlayers->value());
+  m_figuresListObject.append(figureForm);
+
+  for(QPushButton* keys : figureForm->m_updatePos.keys())
+  {
+    int posInBtnGroup = m_btnGroup->buttons().count();
+    m_btnGroup->addButton(keys, posInBtnGroup);
+    m_updatePos[posInBtnGroup] = figureForm;
+  }
+
+
+  m_figuresListWidget->addWidget(figureForm);
+}
+
 void ChessEditor::setupFigureForm()
 {
-  QChar x = 'A';
   QComboBox* typeFigure = new QComboBox();
   typeFigure->addItems({"Пешка", "Конь", "Ферзь", "Слон", "Кароль", "Ладья"});
 
@@ -319,77 +335,34 @@ void ChessEditor::setupFigureForm()
 
   int posInBtnGroup = m_btnGroup->buttons().count();
   m_btnGroup->addButton(isSetPos, posInBtnGroup);
-
+// ww
   QWidget* widgetPos = new QWidget;
   QHBoxLayout* HBoxLayout = new QHBoxLayout(widgetPos);
   HBoxLayout->addWidget(isSetPos);
   HBoxLayout->addWidget(new QLabel("Позиция:"));
   HBoxLayout->addWidget(pos);
   widgetPos->setLayout(HBoxLayout);
-
+// ww
   QGridLayout* layout = new QGridLayout;
   layout->addWidget(new QLabel("Тип: "), 0, 0);
   layout->addWidget(typeFigure, 0, 1);
 
-  layout->addWidget(new QLabel("Количество: "), 1, 0);
-  layout->addWidget(countFigure, 1, 1);
-  layout->addWidget(widgetPos, 2,0, 1, 2);
+  layout->addWidget(new QLabel("Количество"), 1, 0, 1, 2, Qt::AlignCenter);
+  layout->addWidget(countFigure, 2, 1);
+  layout->addWidget(widgetPos, 3,0, 1, 2);
 
-  connect(countFigure, &QSpinBox::valueChanged, [pos](int newCount){
-     if(newCount == 1)
-     {
-       pos->setText("A1");
-       return;
-     } else if(newCount == 0)
-     {
-       pos->setText("");
-     }
+  // m_updatePos[posInBtnGroup] = [=](const QString& str){
+  //   QString currentText = pos->text();
+  //   QStringList positions = currentText.split(',', Qt::SkipEmptyParts);
+  //   int i = positions.indexOf(isSetPos->objectName());
 
-     QString currentText = pos->text();
-     QStringList positions = currentText.split(',', Qt::SkipEmptyParts);
+  //   if(i == -1)
+  //     return;
 
-     int count = positions.size();
-     if(count < newCount)
-     {
-       for (int i = 0; i < newCount - count; ++i) {
-           positions.append("A1");
-       }
-     }
-     else if(count > newCount)
-     {
-       positions = positions.mid(0, newCount);
-     }
-     pos->setText(positions.join(","));
-  });
+  //   positions[i] = str;
 
-  m_updatePos[posInBtnGroup] = [=](const QString& str){
-    QString currentText = pos->text();
-    QStringList positions = currentText.split(',', Qt::SkipEmptyParts);
-    int i = positions.indexOf(isSetPos->objectName());
+  //   pos->setText(positions.join(","));
+  // };
 
-    if(i == -1)
-      return;
-
-    positions[i] = str;
-
-    pos->setText(positions.join(","));
-  };
-
-  m_figureExtractors.append([=](){
-    QJsonObject figure;
-
-    QStringList list = pos->text().split(',', Qt::SkipEmptyParts);
-    QJsonArray array;
-    for (const QString &str : list) {
-        array.append(str);
-    }
-
-    figure[TYPE_FIGURE] = typeFigure->currentText();
-    figure[COUNT_FIGURE] = countFigure->value();
-    figure[START_POSITIONS] = array;
-
-    return figure;
-  });
-
-  m_figuresList->addLayout(layout);
+  m_figuresListWidget->addLayout(layout);
 }
