@@ -1,7 +1,7 @@
 #ifndef FIGUREFORM_H
 #define FIGUREFORM_H
 
-#include <QWidget>
+#include "../../base/BaseWidget.h"
 
 class QLabel;
 class QSpinBox;
@@ -10,28 +10,33 @@ class QGridLayout;
 class QPushButton;
 class QAbstractButton;
 
-class FigureForm : public QWidget
+class FigureForm : public BaseWidget
 {
   Q_OBJECT
 public:
-  FigureForm(int countPlayers);
+  FigureForm(QJsonObject data = QJsonObject());
 
-  QJsonObject toJson();
+  QJsonObject toJson(QJsonObject data);
+
+  void updateForm(QJsonObject data = QJsonObject());
 
 private:
   void setup();
 
-  void setupCountFigure();
-  void setupStartPosList();
+  void setupCountFigure(QJsonObject data = QJsonObject());
+  void setupStartPosList(QJsonObject data = QJsonObject());
   void chanPos(const QString& newPos, QAbstractButton* btn);
+  void connectSpinboxSignals();
 
 private:
-  static int m_countPlauers;
+  int m_countPlayers;
 
   QComboBox* m_typeFigure;
 
   QGridLayout* m_figureCount;
   QGridLayout* m_startPosList;
+
+  QJsonObject* m_figureInfo;
 
   QMap<QString, QLabel*> m_poslabels;
   QMap<QString, QSpinBox*> m_spinbox;

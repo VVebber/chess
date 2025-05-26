@@ -68,13 +68,22 @@ void BoardChess::paint(QPainter *painter, const QStyleOptionGraphicsItem *option
   }
 }
 
+QString BoardChess::getPos(int x, int y)
+{
+  QChar posX = QChar('1' + x);
+  QChar posY = QChar('A' + y);
+
+  qDebug()<<QString(posY) + QString(posX);
+  return QString(posY) + QString(posX);
+}
+
 void BoardChess::mousePressEvent(QGraphicsSceneMouseEvent* event)
 {
   QPoint posPressed = event->pos().toPoint();
-  QChar posX = QChar('1' + (posPressed.x()) / 40);
-  QChar posY = QChar('A' + (posPressed.y()) / 40);
+  int x = posPressed.x() / 40;
+  int y = posPressed.y() / 40;
 
-  emit cellName(QString(posY) + QString(posX));
+  emit cellName(getPos(y, x));
 }
 
 void BoardChess::squareBoard(QPainter *painter)
@@ -91,7 +100,7 @@ void BoardChess::squareBoard(QPainter *painter)
     int x = 40 * 0;
     int y = 40 * i;
 
-    charY = QChar('A' + i);
+    charY = QChar('1' + i);
 
     if(i < m_sizeBoard.height())
       painter->drawText(x - 40, y + 40, charY);
@@ -100,9 +109,9 @@ void BoardChess::squareBoard(QPainter *painter)
     {
       x = 40 * j;
       y = 40 * i;
-      charX = QChar('1' + j);
+      charX = QChar('A' + j);
 
-      QString cellName = QString("%1%2").arg(charY).arg(charX);
+      QString cellName = QString("%1%2").arg(charX).arg(charY);
 
       if (m_noShowCells.contains(cellName))
         continue;

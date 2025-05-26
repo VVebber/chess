@@ -14,6 +14,8 @@ public:
   QRectF boundingRect() const override;
   void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget = nullptr) override;
 
+  static QString getPos(int x, int y);
+
 public slots:
   void update(QJsonObject data);
   void mousePressEvent(QGraphicsSceneMouseEvent* event) override;

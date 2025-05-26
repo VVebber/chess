@@ -1,6 +1,8 @@
 #ifndef BASEWIDGET_H
 #define BASEWIDGET_H
 
+#include "../../core/AppVariables.h"
+
 #include <QWidget>
 #include <QJsonObject>
 
@@ -17,6 +19,10 @@ public slots:
 
 signals:
     void setWidget(QString name);
+
+protected:
+    static QJsonObject m_currentInfoChess;
+    AppVariables m_variabels;
 };
 
 #endif // BASEWIDGET_H

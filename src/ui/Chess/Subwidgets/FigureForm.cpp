@@ -9,24 +9,43 @@
 #include <QJsonObject>
 #include <QJsonArray>
 
-int FigureForm::m_countPlauers;
-
-FigureForm::FigureForm(int countPlayers)
+FigureForm::FigureForm(QJsonObject data)
 {
   m_figureCount = new QGridLayout;
   m_startPosList = new QGridLayout;
 
   m_typeFigure = new QComboBox;
 
-  m_countPlauers = countPlayers;
+  m_countPlayers = 0;
+
   setup();
+  updateForm(data);
+}
+
+void FigureForm::updateForm(QJsonObject data)
+{
+  m_countPlayers = m_currentInfoChess[COUNT_PLAYERS].toInt();
+  while(m_figureCount->count() > m_countPlayers)
+  {
+    delete m_spinbox.take(m_spinbox.lastKey());
+    removeLastFromLayout(m_figureCount);
+    m_figureCount->update();
+  }
+  setupCountFigure(data);
+
+  while(m_startPosList->count() > m_countPlayers)
+  {
+    delete m_poslabels.take(m_poslabels.lastKey());
+    removeLastFromLayout(m_startPosList);
+    m_startPosList->update();
+  }
+  setupStartPosList(data);
+
+  connectSpinboxSignals();
 }
 
 void FigureForm::setup()
 {
-  setupCountFigure();
-  setupStartPosList();
-
   m_typeFigure->addItems({"Пешка", "Конь", "Ферзь", "Слон", "Кароль", "Ладья"});
 
   QGridLayout* layout = new QGridLayout;
@@ -36,10 +55,17 @@ void FigureForm::setup()
   layout->addLayout(m_figureCount, 2, 0, 1, 2);
   layout->addWidget(new QLabel("Начальные позиции"), 3, 0, 1, 2, Qt::AlignCenter);
   layout->addLayout(m_startPosList, 4, 0, 1, 2);
+  connectSpinboxSignals();
 
+  this->setLayout(layout);
+}
+
+void FigureForm::connectSpinboxSignals()
+{
   QStringList keys = m_spinbox.keys();
   for(auto& key :keys)
   {
+    m_spinbox[key]->disconnect();
     connect(m_spinbox[key], &QSpinBox::valueChanged, [key, this](int newCount){
       if(newCount == 1)
       {
@@ -67,14 +93,10 @@ void FigureForm::setup()
       m_poslabels[key]->setText(positions.join(","));
     });
   }
-
-  this->setLayout(layout);
 }
 
-QJsonObject FigureForm::toJson()
+QJsonObject FigureForm::toJson(QJsonObject data)
 {
-  QJsonObject data;
-
   int count = 0;
   for(auto& fcount : m_spinbox)
   {
@@ -101,20 +123,26 @@ QJsonObject FigureForm::toJson()
   return data;
 }
 
-void FigureForm::setupCountFigure()
+void FigureForm::setupCountFigure(QJsonObject data)
 {
-  QString player = "Игрок_%1";
-  for(int i = 0; i < m_countPlauers; i++)
+  for(int i = m_figureCount->count(); i < m_countPlayers; i++)
   {
     QSpinBox* spinBox = new QSpinBox;
-    m_spinbox[player.arg(i)] = spinBox;
+    m_spinbox[PLAYER.arg(i)] = spinBox;
+
+    if(data.contains(START_POSITIONS))
+    {
+      QJsonObject startPos = data[START_POSITIONS].toObject();
+      int count = startPos.value(PLAYER.arg(i)).toArray().size();
+      spinBox->setValue(count);
+    }
 
     QHBoxLayout* box = new QHBoxLayout;
-    box->addWidget(new QLabel(player.arg(i)));
+    box->addWidget(new QLabel(PLAYER.arg(i)));
     box->addWidget(spinBox);
 
-    int x = m_figureCount->count() / 2;
-    int y = m_figureCount->count() % 2;
+    int x = i / 2;
+    int y = i % 2;
     m_figureCount->addLayout(box, x, y);
   }
 }
@@ -134,27 +162,37 @@ void FigureForm::chanPos(const QString& newPos, QAbstractButton* btn)
   m_updatePos[button]->setText(positions.join(","));
 }
 
-void FigureForm::setupStartPosList()
+void FigureForm::setupStartPosList(QJsonObject data)
 {
-  QString player = "Игрок_%1";
 
-  for(int i = 0; i < m_countPlauers; i++)
+  for(int i = m_startPosList->count(); i < m_countPlayers; i++)
   {
     QLabel* pos = new QLabel();
     QPushButton* upDatePos = new QPushButton;
     upDatePos->setCheckable(true);
 
-    m_poslabels[player.arg(i)] = pos;
+    m_poslabels[PLAYER.arg(i)] = pos;
     m_updatePos[upDatePos] = pos;
 
     QHBoxLayout* Hbox = new QHBoxLayout;
-    Hbox->addWidget(new QLabel(player.arg(i)));
+    Hbox->addWidget(new QLabel(PLAYER.arg(i)));
     Hbox->addWidget(upDatePos);
     Hbox->addWidget(new QLabel("Позиция:"));
     Hbox->addWidget(pos);
 
+    if(data.contains(START_POSITIONS))
+    {
+      QJsonArray startPos = data[START_POSITIONS].toObject().value(PLAYER.arg(i)).toArray();
+      QStringList parts;
+      for (auto part : startPos)
+      {
+        parts.append(part.toString());
+      }
+      pos->setText(parts.join(","));
+    }
+
     int x = m_startPosList->count();
-    m_startPosList->addLayout(Hbox, x, 0);
+    m_startPosList->addLayout(Hbox, i, 0);
   }
 }
 

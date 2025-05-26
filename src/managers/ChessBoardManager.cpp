@@ -7,6 +7,8 @@
 
 ChessBoardManager::ChessBoardManager()
 {
+  m_mode = EditMode::Standard;
+  m_idFigure = -1;
   m_currentScene = new QGraphicsScene();
   BoardChess* chessBoard = new BoardChess();
   FiguresManager* figures = &FiguresManager::getInstance();
@@ -24,6 +26,22 @@ ChessBoardManager::ChessBoardManager()
 
   m_currentScene->addItem(chessBoard);
   m_currentScene->addItem(figures);
+}
+
+void ChessBoardManager::setEditMode(EditMode mode)
+{
+  m_mode = mode;
+  FiguresManager::getInstance().setEditMode(m_mode);
+}
+
+EditMode ChessBoardManager::editMode() const
+{
+  return m_mode;
+}
+
+void ChessBoardManager::setIdFigure(int idFigure)
+{
+  m_idFigure = idFigure;
 }
 
 void ChessBoardManager::setTypeChess(QJsonObject data)

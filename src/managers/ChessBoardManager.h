@@ -4,16 +4,24 @@
 #include <QObject>
 #include <QJsonObject>
 
+#include "../core/Enums.h"
+
 class QGraphicsScene;
 
 class ChessBoardManager : public QObject
 {
   Q_OBJECT
+
+
 public:
   static ChessBoardManager& getInstance();
 
   QGraphicsScene* getChessBoard();
   void setTypeChess(QJsonObject data);
+
+  void setEditMode(EditMode mode);
+  EditMode editMode() const;
+  void setIdFigure(int idFigure);
 
 private:
   ChessBoardManager();
@@ -26,6 +34,12 @@ signals:
 
 private:
   QGraphicsScene* m_currentScene;
+
+  EditMode m_mode;
+  int m_idFigure;
+
+  friend class FiguresManager;
+  friend class ChessEditor;
 };
 
 #endif // CHESSBOARDMANAGER_H

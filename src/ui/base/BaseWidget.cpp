@@ -7,6 +7,8 @@
 #include <QLayout>
 #include <QPushButton>
 
+QJsonObject BaseWidget::m_currentInfoChess;
+
 BaseWidget::BaseWidget(QWidget *parent) : QWidget{parent}
 {
 
