@@ -21,11 +21,9 @@ public:
 public slots:
   void  updateJson();
 
-signals:
-  void update(QJsonObject data);
-
 private:
   void setup();
+  void updateForm();
 
   void initDirectionsGrid();
   QWidget* directionsGrid();
@@ -48,6 +46,7 @@ private:
   QGridLayout* m_directionsGrid;
 
   QMap<QString, std::function<QJsonArray()>> m_jsonDirection;
+  QMap<QString, std::function<void(QString& player, QJsonArray array)>> m_direction;
 };
 
 /*

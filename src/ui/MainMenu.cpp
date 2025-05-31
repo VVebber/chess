@@ -7,6 +7,7 @@
 
 MainMenu::MainMenu()
 {
+  setObjectName(WIDGET_MAIN_MENU);
   setup();
 }
 

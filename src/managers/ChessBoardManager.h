@@ -29,7 +29,7 @@ private:
   ChessBoardManager& operator=(const ChessBoardManager&) = delete;
 
 signals:
-  void update(QJsonObject data);
+  void updateSchene(QJsonObject data);
   void cellName(const QString pos);
 
 private:

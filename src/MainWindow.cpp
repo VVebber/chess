@@ -6,9 +6,18 @@
 
 MainWindow::MainWindow()
 {
+  setObjectName("MainWindow");
   resize(1280,720);
   m_currentWidget = nullptr;
-  setWidget(WIDGET_MAIN_MENU);
+  setWidget(WIDGET_CHESS_GAME);
+  setStyleSheet(R"(
+     #MainWindow  {
+          background-image: url(./img/backgrounds/1_background.png);     /* Путь к текстуре */
+          background-repeat: no-repeat;
+          background-position: center;
+          background-origin: content;
+      }
+  )");
 }
 
 void MainWindow::setWidget(QString name)

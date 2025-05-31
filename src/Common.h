@@ -7,7 +7,7 @@ class QJsonValue;
 class QJsonArray;
 class QPushButton;
 
-const QString WIDGET_MAIN_MENU = "main menu";
+const QString WIDGET_MAIN_MENU = "mainMenu";
 
 const QString WIDGET_CHESS_GAME = "chess game menu";
 const QString WIDGET_SUDOKU_GAME = "sudoku game menu";

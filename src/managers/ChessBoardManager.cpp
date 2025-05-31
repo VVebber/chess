@@ -13,7 +13,7 @@ ChessBoardManager::ChessBoardManager()
   BoardChess* chessBoard = new BoardChess();
   FiguresManager* figures = &FiguresManager::getInstance();
 
-  connect(this, &ChessBoardManager::update,
+  connect(this, &ChessBoardManager::updateSchene,
           this,[this, chessBoard, figures](QJsonObject data){
 
     chessBoard->update(data);
@@ -46,7 +46,7 @@ void ChessBoardManager::setIdFigure(int idFigure)
 
 void ChessBoardManager::setTypeChess(QJsonObject data)
 {
-  emit update(data);
+  emit updateSchene(data);
 }
 
 ChessBoardManager& ChessBoardManager::getInstance()

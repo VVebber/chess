@@ -32,13 +32,14 @@ add_executable(QtChess
     src/models/Figure.h src/models/Figure.cpp
     src/models/BoardChess.h src/models/BoardChess.cpp
 
-
     src/managers/ChessBoardManager.h src/managers/ChessBoardManager.cpp
     src/managers/FiguresManager.h src/managers/FiguresManager.cpp
     src/managers/TextureManager.h src/managers/TextureManager.cpp
 
     src/core/AppVariables.h src/core/AppVariables.cpp
     src/core/Enums.h src/core/Enums.cpp
+    src/models/MovePlanner.h src/models/MovePlanner.cpp
+    src/models/Move.h src/models/Move.cpp
 )
 
 # configure_file(AppSettings.txt ${CMAKE_BINARY_DIR} COPYONLY)

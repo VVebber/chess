@@ -1,13 +1,12 @@
 #ifndef FIGURE_H
 #define FIGURE_H
 
+#include "Move.h"
+
 #include <QJsonObject>
 #include <QGraphicsObject>
 
-struct Move {
-  int x, y;
-  QColor color;
-};
+class MovePlanner;
 
 class Figure : public QGraphicsObject
 {
@@ -24,6 +23,9 @@ public slots:
   void mousePressEvent(QGraphicsSceneMouseEvent* event) override;
 
 private:
+  QPixmap colorizedPixmap(const QPixmap &source, const QColor &color);
+
+private:
   QJsonObject m_infoFigure;
   QPixmap m_pixmap;
 
@@ -33,6 +35,7 @@ private:
   std::vector<Move> m_highlightMoves;
 
   friend class FiguresManager;
+  friend class MovePlanner;
 };
 
 #endif // FIGURE_H

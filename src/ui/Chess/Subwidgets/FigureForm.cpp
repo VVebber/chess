@@ -15,6 +15,15 @@ FigureForm::FigureForm(QJsonObject data)
   m_startPosList = new QGridLayout;
 
   m_typeFigure = new QComboBox;
+  m_typeFigure->addItems({"Пешка", "Конь", "Королева", "Слон", "Король", "Ладья"});
+
+  if(data.contains(TYPE_FIGURE))
+  {
+    QString type = data.value(TYPE_FIGURE).toString();
+    int index = m_typeFigure->findText(type);
+    if (index != -1)
+        m_typeFigure->setCurrentIndex(index);
+  }
 
   m_countPlayers = 0;
 
@@ -46,7 +55,6 @@ void FigureForm::updateForm(QJsonObject data)
 
 void FigureForm::setup()
 {
-  m_typeFigure->addItems({"Пешка", "Конь", "Ферзь", "Слон", "Кароль", "Ладья"});
 
   QGridLayout* layout = new QGridLayout;
   layout->addWidget(new QLabel("Тип: "), 0, 0);

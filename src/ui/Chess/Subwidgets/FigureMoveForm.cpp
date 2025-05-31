@@ -29,7 +29,6 @@ FigureMoveForm::FigureMoveForm()
 
   connect(m_listFigure, &QComboBox::currentIndexChanged, [=](int id){
     ChessBoardManager::getInstance().setIdFigure(id);
-    this->update(m_currentInfoChess);
 
     if(m_previousId != -1)
     {
@@ -39,8 +38,30 @@ FigureMoveForm::FigureMoveForm()
     }
 
     m_previousId = id;
+    updateForm();
   });
   setup();
+}
+
+void FigureMoveForm::updateForm()
+{
+  QJsonArray figures = m_currentInfoChess[FIGURES].toArray();
+
+  QSpinBox* strokeLength = qobject_cast<QSpinBox*>(m_variabels.getWidget(STROKE_LENGTH));
+
+  QJsonObject figure;
+  if(figures.size() >= m_previousId)
+  {
+    figure = figures.at(m_previousId).toObject();
+  }
+
+  QJsonObject movePatterns = figure[MOVE_PATTERNS].toObject();
+
+  strokeLength->setValue(movePatterns[STROKE_LENGTH].toInt());
+
+  QJsonObject dimensions = movePatterns[DIMENSIONS].toObject();
+  for(auto key : m_direction.keys())
+    m_direction[key](key, dimensions[key].toArray());
 }
 
 QJsonArray FigureMoveForm::toJson()
@@ -77,10 +98,13 @@ QJsonArray FigureMoveForm::toJson()
 
 void FigureMoveForm::updateJson()
 {
+  qDebug()<<Q_FUNC_INFO;
   m_infoFigures = m_currentInfoChess[FIGURES].toArray();
+  ChessBoardManager::getInstance().setIdFigure(m_listFigure->currentIndex());
 
   m_listFigure->clear();
   m_jsonDirection.clear();
+  m_direction.clear();
   for(int i = 0; i < m_infoFigures.size(); i++)
   {
     QJsonObject figureInfo = m_infoFigures.at(i).toObject();
@@ -255,6 +279,8 @@ QWidget* FigureMoveForm::directionsGrid()
   layout->addWidget(down, 2, 1);
   layout->addWidget(downRight, 2, 2);
 
+
+
   QString player = PLAYER.arg(m_directionsGrid->count());
   m_jsonDirection.insert(player,[=]()->QJsonArray{
     QVector<QString> codes = {"UL", "U", "UR", "R", "DL", "D", "DR", "L"};
@@ -266,6 +292,17 @@ QWidget* FigureMoveForm::directionsGrid()
             array.append(codes[i]);
     }
     return array;
+  });
+
+  m_direction.insert(player, [=](QString& player, QJsonArray array){
+
+    QVector<QCheckBox*> boxes = {upLeft, up, upRight, rigt, downLeft, down, downRight, left};
+    QVector<QString> codes = {"UL", "U", "UR", "R", "DL", "D", "DR", "L"};
+
+    for(int i = 0; i < boxes.size(); i++)
+    {
+      boxes[i]->setChecked(array.contains(codes[i]));
+    }
   });
 
   mainWidget->setLayout(layout);

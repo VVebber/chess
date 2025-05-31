@@ -1,4 +1,6 @@
 #include "Figure.h"
+#include "MovePlanner.h"
+
 #include "../Common.h"
 #include "../managers/TextureManager.h"
 #include "../managers/FiguresManager.h"
@@ -6,10 +8,41 @@
 #include <QPainter>
 #include <QJsonArray>
 
+
 Figure::Figure(QString player, QJsonObject data) : m_infoFigure(data)
 {
   m_player = player;
-  m_pixmap = TextureManager::instance().getTexture(data[TYPE_FIGURE].toString());
+  QPixmap base = TextureManager::instance().getTexture(data[TYPE_FIGURE].toString());
+
+  QColor color = Qt::white;
+  if(m_player == PLAYER.arg(0))
+  {}
+  else if(m_player == PLAYER.arg(1))
+  {
+   color = QColor(60, 70, 54);
+  }
+  m_pixmap = colorizedPixmap(base, color);
+}
+
+QPixmap Figure::colorizedPixmap(const QPixmap &base, const QColor &color)
+{
+  QPixmap colored(base.size());
+  colored.fill(Qt::transparent);
+  // colored
+
+  QPainter painter(&colored);
+  painter.setCompositionMode(QPainter::CompositionMode_Source);
+  painter.drawPixmap(0, 0, base);
+
+  painter.setCompositionMode(QPainter::CompositionMode_Multiply);
+  painter.fillRect(colored.rect(), color); // нужный цвет
+
+  painter.setCompositionMode(QPainter::CompositionMode_DestinationIn);
+  painter.drawPixmap(0, 0, base); // применяем альфа-канал от оригинала
+
+  painter.end();
+
+  return colored;
 }
 
 void Figure::setPosition(QString pos)
@@ -64,6 +97,7 @@ std::vector<Move> Figure::movePatterns()
       m.x = dx * i;
       m.y = dy * i;
       m.color = Qt::white;
+      m.direction = dir;
       m_highlightMoves.push_back(m);
     }
   }
@@ -77,6 +111,5 @@ QRectF Figure::boundingRect() const
 
 void Figure::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
-  painter->setBrush(Qt::green);
   painter->drawPixmap(boundingRect().toRect(), m_pixmap);
 }

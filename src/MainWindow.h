@@ -14,8 +14,8 @@ public:
 public slots:
     void setWidget(QString name);
 
-private:
-  void initStyle();
+// private:
+  // void initStyle();
 
 private:
   BaseWidget* m_currentWidget;

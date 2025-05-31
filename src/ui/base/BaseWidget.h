@@ -20,6 +20,10 @@ public slots:
 signals:
     void setWidget(QString name);
 
+
+protected:
+    void setBackground(QString type);
+
 protected:
     static QJsonObject m_currentInfoChess;
     AppVariables m_variabels;

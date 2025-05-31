@@ -36,7 +36,7 @@ ChessEditor::ChessEditor()
   m_currentType = CellType::None;
   
   connect(this, &ChessEditor::updateChess,
-          &ChessBoardManager::getInstance(), &ChessBoardManager::update);
+          &ChessBoardManager::getInstance(), &ChessBoardManager::updateSchene);
   
   connect(&ChessBoardManager::getInstance(), &ChessBoardManager::cellName,
           this, &ChessEditor::toggleCellState);
@@ -133,6 +133,7 @@ QWidget* ChessEditor::initTopToolbar()
   QWidget* mainWidget = new QWidget;
   
   QPushButton* back = new QPushButton("назад");
+  back->setObjectName(WIDGET_CHESS_GAME);
   QPushButton* saveJson = new QPushButton("Сохранить");
   
   QPushButton* btnNoShowCells = setupBtnIcon(LINK_IMG_DELETE_1);
@@ -162,6 +163,7 @@ QWidget* ChessEditor::initTopToolbar()
   mainBox->addWidget(add, 0, 2);
   mainBox->addWidget(join, 0, 3);
 
+  connect(back, &QPushButton::clicked, this, &BaseWidget::onSetWidgetClicked);
   connect(saveJson, &QPushButton::clicked, this, &ChessEditor::onSaveToFileClicked);
   connect(btnNoShowCells, &QPushButton::clicked, this, [this]() {
     m_currentType = (m_currentType == CellType::NoShow) ? CellType::None : CellType::NoShow;
@@ -337,6 +339,7 @@ QHBoxLayout* ChessEditor::initModeSwitchFigure()
       box->itemAt(2)->widget()->show();
       ChessBoardManager::getInstance().setEditMode(EditMode::FigureSettings);
     }
+    ChessBoardManager::getInstance().m_currentScene->update();
     
   });
   
@@ -454,7 +457,7 @@ QWidget* ChessEditor::initRightSidebar()
   
   m_dimensions->setPlaceholderText("2x2");
   
-  QPushButton* saveProperties = new QPushButton("Сохранить");
+  QPushButton* saveProperties = new QPushButton("Сохранить/Обновить");
   
   QSpinBox* countPlayers = new QSpinBox;
   m_variabels.addWidget(COUNT_PLAYERS, countPlayers);

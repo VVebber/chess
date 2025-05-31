@@ -3,6 +3,7 @@
 #include "../Common.h"
 #include "ChessBoardManager.h"
 #include "../models/BoardChess.h"
+#include "../models/MovePlanner.h"
 
 #include <QJsonArray>
 #include <QPainter>
@@ -41,16 +42,14 @@ void FiguresManager::onFigureClicked(Figure* fig)
 {
   qDebug()<<Q_FUNC_INFO;
   m_selectedFigure = fig;
-  m_availableMoves = fig->movePatterns();
-}
-
-void FiguresManager::MovePlanner()
-{
-
+  MovePlanner planner(m_figures);
+  m_availableMoves = planner.filterAvailableMoves(m_selectedFigure, fig->movePatterns());
 }
 
 void FiguresManager::highlightMoves(QPainter *painter)
 {
+  qDebug()<<"count move: "<<m_availableMoves.size();
+
   if(m_availableMoves.empty())
     return;
 
@@ -73,7 +72,7 @@ void FiguresManager::highlightMoves(QPainter *painter)
     int targetRow = startRow + move.y;
 
     QPointF posPointF = QPointF(targetCol * 40 + 20, targetRow * 40 + 20);
-    painter->setBrush(Qt::green);
+    painter->setBrush(move.color);
     painter->drawEllipse(posPointF, 20, 20);
   }
 }

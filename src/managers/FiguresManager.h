@@ -26,7 +26,6 @@ private:
   FiguresManager& operator=(const FiguresManager&) = delete;
 
 private:
-  void MovePlanner();
   void highlightMoves(QPainter *painter);
 
 public slots:
