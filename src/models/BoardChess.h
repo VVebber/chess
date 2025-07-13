@@ -26,6 +26,7 @@ signals:
 private:
   void setup(QJsonObject data);
   void squareBoard(QPainter *painter);
+  void circleBoard(QPainter* painter);
 
 private:
   QJsonObject m_infoBoard;
