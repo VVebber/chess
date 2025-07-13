@@ -1,19 +1,20 @@
 #include "ChessMenu.h"
 #include "../../Common.h"
-#include "../../managers/ChessBoardManager.h"
+#include "../../MainWindow.h"
+#include "../../managers/BoardViewManager.h"
 
 #include <QLabel>
 #include <QLayout>
 #include <QPushButton>
 #include <QGraphicsView>
 
-ChessMenu::ChessMenu()
+ChessMenu::ChessMenu(QWidget* parent) : BaseWidget(parent)
 {
   resize(1280,720);
   setObjectName(WIDGET_CHESS_GAME);
   m_display = new QGraphicsView;
   m_display->setFixedSize(550, 550);
-  m_display->setScene(ChessBoardManager::getInstance().getChessBoard());
+  m_display->setScene(BoardViewManager::getInstance().getScene());
 
   setup();
   setupStyleSheet();
@@ -46,22 +47,33 @@ QWidget* ChessMenu::setupBtn()
   chessEditor->setObjectName(WIDGET_CHESS_EDITOR);
 
   QPushButton* startGame = new QPushButton("Начать играть");
+  startGame->setObjectName(WIDGET_PLAY_MENU);
   QPushButton* chessProblems = new QPushButton("Задачи");
+  chessProblems->hide();
   QPushButton* settings = new QPushButton("Настройки");
+  settings->hide();
   QPushButton* exit = new QPushButton("выйти");
 
+  if(qobject_cast<MainWindow*>(parent()))
+  {
+    connect(exit, &QPushButton::clicked, qobject_cast<MainWindow*>(parent()), &MainWindow::close);
+  }
+  else qWarning()<<"Exit button: parent is not MainWindow";
 
   QVBoxLayout* btnBox = new QVBoxLayout();
   btnBox->setSpacing(12);
+  btnBox->addStretch();
   btnBox->addWidget(startGame);
   btnBox->addWidget(chessProblems);
   btnBox->addWidget(settings);
   btnBox->addWidget(chessEditor);
   btnBox->addWidget(exit);
+  btnBox->addStretch();
 
   mainWidget->setLayout(btnBox);
 
   connect(chessEditor, &QPushButton::clicked, this, &BaseWidget::onSetWidgetClicked);
+  connect(startGame, &QPushButton::clicked, this, &BaseWidget::onSetWidgetClicked);
 
   return mainWidget;
 }

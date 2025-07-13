@@ -25,7 +25,7 @@ void MainWindow::setWidget(QString name)
   if(name.isEmpty())
     return;
 
-  BaseWidget* newWidget = WidgetFactory::createWidget(name);
+  BaseWidget* newWidget = WidgetFactory::createWidget(name, this);
   if(newWidget != nullptr)
   {
     if(m_currentWidget != nullptr)

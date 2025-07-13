@@ -13,6 +13,7 @@ class Figure : public QGraphicsObject
   Q_OBJECT
 public:
   Figure(QString player, QJsonObject data = QJsonObject());
+  virtual ~Figure();
   void setPosition(QString pos);
 
   QRectF boundingRect() const override;
@@ -25,17 +26,22 @@ public slots:
 private:
   QPixmap colorizedPixmap(const QPixmap &source, const QColor &color);
 
+  std::vector<Move> stepMoves(const QJsonObject& movePatterns);
+  std::vector<Move> jumpMoves(const QJsonObject& movePatterns);
+
 private:
   QJsonObject m_infoFigure;
   QPixmap m_pixmap;
 
   QString m_boardPos;
   QString m_player;
+  QString m_type;
 
-  std::vector<Move> m_highlightMoves;
+  bool m_hasMoved;
 
   friend class FiguresManager;
   friend class MovePlanner;
+  friend class GameManager;
 };
 
 #endif // FIGURE_H

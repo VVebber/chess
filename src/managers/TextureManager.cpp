@@ -15,7 +15,7 @@ void TextureManager::setupTexturs()
   getTexture(LINK_IMG_QUEEN, QUEEN);
   getTexture(LINK_IMG_ROOK, ROOK);
 
-  getTexture(LINC_ING_ARROW_START, ARROW_SSTART);
+  getTexture(LINK_IMG_ARROW_START, ARROW_START);
 }
 
 // getTexture(LINK_IMG)

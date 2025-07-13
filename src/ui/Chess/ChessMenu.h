@@ -9,7 +9,7 @@ class ChessMenu : public BaseWidget
 {
     Q_OBJECT
 public:
-  ChessMenu();
+  ChessMenu(QWidget* parent = nullptr);
 
 private:
   void setup();

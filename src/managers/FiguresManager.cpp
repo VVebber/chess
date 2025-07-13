@@ -1,10 +1,14 @@
 #include "FiguresManager.h"
+#include "BoardViewManager.h"
+#include "GameManager.h"
 
 #include "../Common.h"
-#include "ChessBoardManager.h"
-#include "../models/BoardChess.h"
+#include "../core/ChessCoord.h"
 #include "../models/MovePlanner.h"
 
+#include "../factory/FiguresFactory.h"
+
+#include <QGraphicsSceneMouseEvent>
 #include <QJsonArray>
 #include <QPainter>
 
@@ -14,10 +18,9 @@ FiguresManager& FiguresManager::getInstance()
   return instans;
 }
 
-FiguresManager::FiguresManager()
-{
+FiguresManager::FiguresManager(){}
 
-}
+FiguresManager::~FiguresManager(){}
 
 QRectF FiguresManager::boundingRect() const
 {
@@ -41,98 +44,131 @@ void FiguresManager::setEditMode(EditMode mode)
 void FiguresManager::onFigureClicked(Figure* fig)
 {
   qDebug()<<Q_FUNC_INFO;
+
+
+  if(!GameManager::instance().isCurrentPlayer(fig->m_player))
+  {
+    qDebug() << "Not this player's turn!";
+    return;
+  }
+
+  if(GameManager::instance().isCheckShah(fig))
+  {
+    return;
+  }
+
   m_selectedFigure = fig;
-  MovePlanner planner(m_figures);
+
+  QSize boardSize = BoardViewManager::getInstance().getSizeBoard();
+  MovePlanner planner(m_figures, boardSize);
   m_availableMoves = planner.filterAvailableMoves(m_selectedFigure, fig->movePatterns());
+
+  emit updateScene();
 }
+
+void FiguresManager::onMoveCellClicked(const QString targetPos)
+{
+  if (!m_selectedFigure || m_availableMoves.empty())
+    return;
+
+  QString posFigure = m_selectedFigure->m_boardPos;
+
+  bool isFound = false;
+  Move move;
+  for(auto& mov : m_availableMoves)
+  {
+    QString posMove = ChessCoord::offsetStr(posFigure, mov.x, mov.y);
+    if(targetPos == posMove)
+    {
+      isFound = true;
+      move = mov;
+      break;
+    }
+  }
+
+  if (!isFound)
+    return;
+
+
+  qDebug() << "move.color =" << move.color.name() << "<" << QColor(Qt::red).name();
+  if (move.color == QColor(Qt::red))
+  {
+    for (int i = 0; i < m_figures.size(); ++i) {
+      {
+        if(m_figures[i]->m_boardPos == targetPos)
+        {
+          delete m_figures[i];
+          m_figures.erase(m_figures.begin() + i);
+        }
+      }
+    }
+  }
+
+  m_selectedFigure->setPosition(targetPos);
+  m_selectedFigure->m_hasMoved = false;
+
+  GameManager::instance().nextTurn();
+  m_selectedFigure = nullptr;
+  m_availableMoves.clear();
+
+  for(auto& figure : m_figures)
+    if(figure->m_type == KING)
+    {
+      GameManager::instance().isCheckFromFigure(figure, m_figures);
+    }
+  emit updateScene();
+}
+
 
 void FiguresManager::highlightMoves(QPainter *painter)
 {
-  qDebug()<<"count move: "<<m_availableMoves.size();
-
   if(m_availableMoves.empty())
     return;
 
   if(m_selectedFigure == nullptr)
     return;
 
+  qDebug()<<"count move: "<<m_availableMoves.size();
   qDebug()<<Q_FUNC_INFO;
   QString posFigure = m_selectedFigure->m_boardPos;
 
-  QChar colChar = posFigure[0].toUpper();
-  QChar rowChar = posFigure[1];
-
-
-  int startCol = colChar.toLatin1() - 'A';
-  int startRow = rowChar.toLatin1() - '1';
-
   for(auto& move : m_availableMoves)
   {
-    int targetCol = startCol + move.x;
-    int targetRow = startRow + move.y;
+    QPoint position = ChessCoord::offsetPoint(posFigure, move.x, move.y);
 
-    QPointF posPointF = QPointF(targetCol * 40 + 20, targetRow * 40 + 20);
+    QPointF posPointF = QPointF(position.x() * 40 + 20, position.y() * 40 + 20);
     painter->setBrush(move.color);
     painter->drawEllipse(posPointF, 20, 20);
   }
 }
 
-void FiguresManager::update(QJsonObject data)
+void FiguresManager::clearFigures()
 {
-  for(int i = 0; i < m_figures.size(); i++)
-    delete m_figures[i];
-
+  qDeleteAll(m_figures);
   m_figures.clear();
+}
+
+void FiguresManager::onUpdateFromJson(QJsonObject data)
+{
+  clearFigures();
   m_availableMoves.clear();
   m_selectedFigure = nullptr;
 
-  if(m_mode == EditMode::FigureSettings)
-  {
-    // int pos = arrow.size() / 2;
-    QJsonArray figuresInfo = data[FIGURES].toArray();
-    if (figuresInfo.isEmpty()) return;
-
-    int id = ChessBoardManager::getInstance().m_idFigure;
-    if(id == -1)
-      return;
-
-    QJsonArray posArray = data.value(BOARD).toObject().value(DIMENSIONS).toArray();
-    if(posArray.size() < 2)
-      return;
-
-    QString pos = BoardChess::getPos(posArray.at(0).toString().toInt() / 2,
-                                     posArray.at(1).toString().toInt() / 2);
-
-    QJsonObject figureInfo = figuresInfo[id].toObject();
-    Figure* figure = new Figure("", figureInfo);
-    figure->setPosition(pos);
-    figure->setParentItem(this);
-    m_figures.push_back(figure);
+  if(!data.contains(COUNT_PLAYERS))
     return;
-  }
 
-  QJsonArray figures = data[FIGURES].toArray();
-  
-  for(int i = 0; i < figures.size(); i++)
+  if(!data.contains(FIGURES))
+    return;
+
+  GameManager& manage = GameManager::instance();
+  manage.clear();
+  manage.initPlayer(data[COUNT_PLAYERS].toInt());
+
+  m_figures = FiguresFactory::createFigures(data, m_mode);
+  for(Figure* figure : m_figures)
   {
-    QJsonObject figureInfo = figures[i].toObject();
-    QJsonObject posPlayer = figureInfo[START_POSITIONS].toObject();
-
-    for(auto key : posPlayer.keys())
-    {
-      QJsonArray arrow = posPlayer[key].toArray();
-
-      for(int j = 0; j < arrow.size(); j++)
-      {
-        Figure* figure = new Figure(key, figureInfo);
-        figure->setPosition(arrow.at(j).toString());
-        figure->setParentItem(this);
-
-        Qt::MouseButtons buttons = (m_mode == EditMode::Playing) ? Qt::LeftButton : Qt::NoButton;
-        figure->setAcceptedMouseButtons(buttons);
-
-        m_figures.push_back(figure);
-      }
-    }
+    figure->setParentItem(this);
+    Qt::MouseButtons buttons = (m_mode == EditMode::Playing) ? Qt::LeftButton : Qt::NoButton;
+    figure->setAcceptedMouseButtons(buttons);
   }
 }

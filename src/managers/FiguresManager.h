@@ -1,7 +1,8 @@
+
 #ifndef FIGURESMANAGER_H
 #define FIGURESMANAGER_H
 
-#include "../core/Enums.h"
+#include "../core/EditMode.h"
 #include "../models/Figure.h"
 
 #include <QJsonObject>
@@ -20,16 +21,22 @@ public:
 
   void setEditMode(EditMode mode);
 
+public slots:
+  void onUpdateFromJson(QJsonObject data);
+  void onMoveCellClicked(const QString targetPos);
+
+signals:
+  void updateScene();
+
 private:
   FiguresManager();
+  ~FiguresManager();
   FiguresManager(const FiguresManager&) = delete;
   FiguresManager& operator=(const FiguresManager&) = delete;
 
+  void clearFigures();
 private:
   void highlightMoves(QPainter *painter);
-
-public slots:
-  void update(QJsonObject data);
 
 private:
   QList<Figure*> m_figures;

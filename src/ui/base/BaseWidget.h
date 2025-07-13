@@ -4,7 +4,6 @@
 #include "../../core/AppVariables.h"
 
 #include <QWidget>
-#include <QJsonObject>
 
 class BaseWidget : public QWidget
 {
@@ -25,7 +24,6 @@ protected:
     void setBackground(QString type);
 
 protected:
-    static QJsonObject m_currentInfoChess;
     AppVariables m_variabels;
 };
 

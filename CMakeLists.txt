@@ -22,24 +22,39 @@ add_executable(QtChess
     src/ui/MainMenu.cpp src/ui/MainMenu.h
 
     src/factory/WidgetFactory.h src/factory/WidgetFactory.cpp
+    src/factory/FiguresFactory.h src/factory/FiguresFactory.cpp
+
     src/ui/base/BaseWidget.cpp src/ui/base/BaseWidget.h
     src/ui/Chess/ChessMenu.h src/ui/Chess/ChessMenu.cpp
     src/ui/Chess/ChessEditor.h src/ui/Chess/ChessEditor.cpp
+    src/ui/Chess/PlayMenu.h src/ui/Chess/PlayMenu.cpp
 
-    src/ui/Chess/Subwidgets/FigureForm.h src/ui/Chess/Subwidgets/FigureForm.cpp
-    src/ui/Chess/Subwidgets/FigureMoveForm.h src/ui/Chess/Subwidgets/FigureMoveForm.cpp
+    src/ui/Chess/Subwidgets/ChessEditor/Left/ChessJsonList.h src/ui/Chess/Subwidgets/ChessEditor/Left/ChessJsonList.cpp
+    src/ui/Chess/Subwidgets/ChessEditor/Right/RightMenuWidget.h src/ui/Chess/Subwidgets/ChessEditor/Right/RightMenuWidget.cpp
+    src/ui/Chess/Subwidgets/ChessEditor/Right/FigureForm.h      src/ui/Chess/Subwidgets/ChessEditor/Right/FigureForm.cpp
+    src/ui/Chess/Subwidgets/ChessEditor/Right/FigureMoveForm.h  src/ui/Chess/Subwidgets/ChessEditor/Right/FigureMoveForm.cpp
 
+    src/models/Move.h src/models/Move.cpp
     src/models/Figure.h src/models/Figure.cpp
     src/models/BoardChess.h src/models/BoardChess.cpp
+    src/models/MovePlanner.h src/models/MovePlanner.cpp
 
-    src/managers/ChessBoardManager.h src/managers/ChessBoardManager.cpp
+    src/managers/GameManager.h src/managers/GameManager.cpp
     src/managers/FiguresManager.h src/managers/FiguresManager.cpp
     src/managers/TextureManager.h src/managers/TextureManager.cpp
+    src/managers/BoardViewManager.h src/managers/BoardViewManager.cpp
+    src/managers/SwitchEditorButton.h src/managers/SwitchEditorButton.cpp
 
     src/core/AppVariables.h src/core/AppVariables.cpp
-    src/core/Enums.h src/core/Enums.cpp
-    src/models/MovePlanner.h src/models/MovePlanner.cpp
-    src/models/Move.h src/models/Move.cpp
+    src/core/ChessInfoJson.h src/core/ChessInfoJson.cpp
+    src/core/ChessCoord.h src/core/ChessCoord.cpp
+    src/core/EditMode.h src/core/EditMode.cpp
+
+    src/ui/Chess/Forms/BaseForm.h src/ui/Chess/Forms/BaseForm.cpp
+    src/ui/Chess/Forms/StepForm.h src/ui/Chess/Forms/StepForm.cpp
+    src/ui/Chess/Forms/JumpForm.h src/ui/Chess/Forms/JumpForm.cpp
+    src/ui/Chess/Forms/MoveConditionForm.h src/ui/Chess/Forms/MoveConditionForm.cpp
+    src/ui/Chess/Forms/InitialConditionsForm.h src/ui/Chess/Forms/InitialConditionsForm.cpp
 )
 
 # configure_file(AppSettings.txt ${CMAKE_BINARY_DIR} COPYONLY)

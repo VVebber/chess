@@ -11,11 +11,11 @@ class MainWindow : public QMainWindow
 public:
   MainWindow();
 
+signals:
+  void closeApp();
+
 public slots:
     void setWidget(QString name);
-
-// private:
-  // void initStyle();
 
 private:
   BaseWidget* m_currentWidget;

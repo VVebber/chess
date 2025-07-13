@@ -9,7 +9,7 @@ class MainMenu : public BaseWidget
 {
   Q_OBJECT
 public:
-  MainMenu();
+  MainMenu(QWidget* parent = nullptr);
 
 private:
   void setup();

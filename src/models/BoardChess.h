@@ -14,7 +14,7 @@ public:
   QRectF boundingRect() const override;
   void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget = nullptr) override;
 
-  static QString getPos(int x, int y);
+  QSize size() const;
 
 public slots:
   void update(QJsonObject data);
@@ -26,7 +26,6 @@ signals:
 private:
   void setup(QJsonObject data);
   void squareBoard(QPainter *painter);
-  void circleBoard(QPainter* painter);
 
 private:
   QJsonObject m_infoBoard;

@@ -5,7 +5,7 @@
 #include <QLayout>
 #include <QPushButton>
 
-MainMenu::MainMenu()
+MainMenu::MainMenu(QWidget* parent) : BaseWidget(parent)
 {
   setObjectName(WIDGET_MAIN_MENU);
   setup();
